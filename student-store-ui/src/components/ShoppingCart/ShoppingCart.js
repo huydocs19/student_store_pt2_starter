@@ -20,6 +20,7 @@ export default function ShoppingCart({
   removeFromCart,
   getQuantityOfItemInCart,
   handleOnCheckout,
+  handleLogout,
 }) {
   const navigate = useNavigate()
 
@@ -55,6 +56,7 @@ export default function ShoppingCart({
         setActiveCategory={setActiveCategory}
         handleOnSearchInputChange={handleOnSearchInputChange}
         searchInputValue={searchInputValue}
+        handleLogout={handleLogout}
       />
       <div className="banner">
         <div className="content">

@@ -27,6 +27,7 @@ export default function Orders({
   setActiveCategory,
   handleOnSearchInputChange,
   searchInputValue,
+  handleLogout,
 }) {
   const ordersMapping = groupOrderDetailsByOrderId(orders)
 
@@ -41,6 +42,7 @@ export default function Orders({
         setActiveCategory={setActiveCategory}
         handleOnSearchInputChange={handleOnSearchInputChange}
         searchInputValue={searchInputValue}
+        handleLogout={handleLogout}
       />
       <div className="banner">
         <div className="content">

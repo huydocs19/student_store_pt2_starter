@@ -20,6 +20,7 @@ export default function Home({
   addToCart,
   removeFromCart,
   getQuantityOfItemInCart,
+  handleLogout,
 }) {
   const location = useLocation()
 
@@ -30,7 +31,7 @@ export default function Home({
         el.scrollIntoView({ behavior: "smooth" })
       }
     }
-  }, [location.hash])
+  }, [location.hash])  
 
   return (
     <div className="Home">
@@ -41,6 +42,7 @@ export default function Home({
         setActiveCategory={setActiveCategory}
         handleOnSearchInputChange={handleOnSearchInputChange}
         searchInputValue={searchInputValue}
+        handleLogout={handleLogout}
       />
       <Hero />
       <About />

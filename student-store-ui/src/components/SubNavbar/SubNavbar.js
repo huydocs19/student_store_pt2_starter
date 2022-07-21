@@ -9,6 +9,7 @@ export default function SubNavbar({
   setActiveCategory,
   handleOnSearchInputChange,
   searchInputValue,
+  handleLogout,
 }) {
   const [open, setOpen] = useState(true)
 
@@ -37,10 +38,13 @@ export default function SubNavbar({
 
             <div className="auth">
               {user?.email ? (
-                <Link to="/orders">
-                  <img src={person} alt="avatar" />
-                  {user.email}
-                </Link>
+                <div className="user-buttons">
+                  <Link to="/orders">
+                    <img src={person} alt="avatar" />
+                    {user.email}
+                  </Link>
+                  <span onClick={handleLogout}>Logout</span>
+                </div>
               ) : (
                 <Link to="/login">
                   <img src={person} alt="avatar" />

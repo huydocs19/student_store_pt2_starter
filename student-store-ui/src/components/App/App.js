@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
-import axios from "axios"
+import apiClient from "../../services/apiClient"
 import Home from "../Home/Home"
 import Signup from "../Signup/Signup"
 import Login from "../Login/Login"
@@ -33,47 +33,70 @@ export default function App() {
   const handleOnCheckout = async () => {
     setIsCheckingOut(true)
 
-    try {
-      const res = await axios.post("http://localhost:3001/orders", { order: cart })
-      if (res?.data?.order) {
-        setOrders((o) => [...res.data.order, ...o])
-        setIsCheckingOut(false)
-        setCart({})
-        return res.data.order
-      } else {
-        setError("Error checking out.")
-      }
-    } catch (err) {
-      console.log(err)
-      const message = err?.response?.data?.error?.message
-      setError(message ?? String(err))
-    } finally {
-      setIsCheckingOut(false)
+    const {data, error} = await apiClient.createOrder({ order: cart })
+    if (error) {
+      setError(error)
     }
+    console.log(data)
+    if (data?.order) {
+      setOrders((o) => [...data.order, ...o])
+      setIsCheckingOut(false)
+      setCart({})
+      return data.order    
+    } else {
+      setError("Error checking out.")
+    }
+    setIsCheckingOut(false)    
   }
 
   useEffect(() => {
     const fetchProducts = async () => {
       setIsFetching(true)
 
-      try {
-        const res = await axios.get("http://localhost:3001/store")
-        if (res?.data?.products) {
-          setProducts(res.data.products)
-        } else {
-          setError("Error fetching products.")
-        }
-      } catch (err) {
-        console.log(err)
-        const message = err?.response?.data?.error?.message
-        setError(message ?? String(err))
-      } finally {
-        setIsFetching(false)
+      const {data, error} = await apiClient.fetchProductList()      
+      if (error) {
+        setError(error)
       }
+      if (data?.products) {
+        setProducts(data.products)        
+      } else {
+        setError("Error fetching products.")
+      }
+      setIsFetching(false)
     }
 
     fetchProducts()
   }, [])
+  useEffect(() => {
+    const fetchAuthedUser = async () => {
+      setIsFetching(true)
+      
+      const {data, error} = await apiClient.fetchUserFromToken()      
+      if (error) {
+        setError(error)
+      }
+      if (data?.user) {
+        setUser(data.user)        
+      } else {
+        setError("Error fetching user.")
+      }      
+      setIsFetching(false)
+    }
+
+    const token = localStorage.getItem(apiClient.getTokenKey())    
+    if (token) {
+      apiClient.setToken(token)
+      fetchAuthedUser()
+    }
+    
+  }, [])
+  const handleLogout = async () => {
+    console.log("logout")
+    await apiClient.logOutUser()
+    setUser(null)
+    setOrders([])
+    setError(null)
+  }
 
   return (
     <div className="App">
@@ -94,6 +117,7 @@ export default function App() {
                 addToCart={handleOnAddToCart}
                 removeFromCart={handleOnRemoveFromCart}
                 getQuantityOfItemInCart={handleGetItemQuantity}
+                handleLogout={handleLogout}
               />
             }
           />
@@ -113,6 +137,7 @@ export default function App() {
                 setActiveCategory={setActiveCategory}
                 searchInputValue={searchInputValue}
                 handleOnSearchInputChange={handleOnSearchInputChange}
+                handleLogout={handleLogout}
               />
             }
           />
@@ -135,6 +160,7 @@ export default function App() {
                 getTotalItemsInCart={handleGetTotalCartItems}
                 isCheckingOut={isCheckingOut}
                 handleOnCheckout={handleOnCheckout}
+                handleLogout={handleLogout}
               />
             }
           />
